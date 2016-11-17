@@ -1,0 +1,14 @@
+batch
+    |query('''
+        SELECT "usage_user"
+        FROM golang.autogen."cpu"
+        WHERE "cpu" = 'cpu0'
+    ''')
+        .period(1m)
+        .every(10s)
+    |alert()
+        .id('CPU Batch')
+        .message('{{.ID}} is {{.Level}} with value: {{index .Fields "usage_user"}}')
+        .crit(lambda: "usage_user" > 50)
+        .log('/var/www/golang-milano/TICK/demo/alert.log')
+    |httpOut('usage_user')
